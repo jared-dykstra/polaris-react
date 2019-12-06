@@ -59,21 +59,23 @@ export function Dialog({
         data-polaris-overlay
         ref={containerNode}
       >
-        <TrapFocus>
-          <div
-            className={classes}
-            role="dialog"
-            aria-labelledby={labelledBy}
-            tabIndex={-1}
-          >
-            <KeypressListener
-              keyCode={Key.Escape}
-              handler={onClose}
-              testID="CloseKeypressListener"
-            />
-            {children}
-          </div>
-        </TrapFocus>
+        <div
+          role="dialog"
+          aria-labelledby={labelledBy}
+          tabIndex={-1}
+          className={styles.Dialog}
+        >
+          <TrapFocus>
+            <div className={classes}>
+              <KeypressListener
+                keyCode={Key.Escape}
+                handler={onClose}
+                testID="CloseKeypressListener"
+              />
+              {children}
+            </div>
+          </TrapFocus>
+        </div>
       </div>
     </TransitionChild>
   );

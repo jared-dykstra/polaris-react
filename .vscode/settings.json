@@ -45,5 +45,8 @@
     "types/": true
   },
   "stylelint.autoFixOnSave": true,
-  "typescript.tsdk": "./node_modules/typescript/lib"
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
 }

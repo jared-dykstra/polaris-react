@@ -1,12 +1,13 @@
-import React from 'react';
-import {closest} from '@shopify/javascript-utilities/dom';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   focusFirstFocusableNode,
   findFirstFocusableNode,
   focusLastFocusableNode,
+  findLastFocusableNode,
 } from '@shopify/javascript-utilities/focus';
-import {write} from '@shopify/javascript-utilities/fastdom';
 
+import {Key} from '../../types';
+import {useComponentDidMount} from '../../utilities/use-component-did-mount';
 import {EventListener} from '../EventListener';
 import {Focus} from '../Focus';
 
@@ -15,81 +16,110 @@ export interface TrapFocusProps {
   children?: React.ReactNode;
 }
 
-interface State {
-  shouldFocusSelf: boolean | undefined;
-}
+export function TrapFocus({trapping = true, children}: TrapFocusProps) {
+  const [shouldFocusSelf, setFocusSelf] = useState<boolean | undefined>(
+    undefined,
+  );
 
-export class TrapFocus extends React.PureComponent<TrapFocusProps, State> {
-  state: State = {
-    shouldFocusSelf: undefined,
+  const focusTrapWrapper = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    return () => {
+      document.removeEventListener('keydown', handleKeyDownLastElement);
+      document.removeEventListener('keydown', handleKeyDownFirstElement);
+    };
+  });
+
+  const handleTrappingChange = () => {
+    if (
+      focusTrapWrapper.current &&
+      focusTrapWrapper.current.contains(document.activeElement)
+    ) {
+      return false;
+    }
+    return trapping;
   };
 
-  private focusTrapWrapper: HTMLElement;
+  useComponentDidMount(() => setFocusSelf(handleTrappingChange()));
 
-  componentDidMount() {
-    this.setState(this.handleTrappingChange());
-  }
-
-  handleTrappingChange() {
-    const {trapping = true} = this.props;
-
-    if (this.focusTrapWrapper.contains(document.activeElement)) {
-      return {shouldFocusSelf: false};
-    }
-
-    return {shouldFocusSelf: trapping};
-  }
-
-  render() {
-    const {children} = this.props;
-
-    return (
-      <Focus disabled={this.shouldDisable} root={this.focusTrapWrapper}>
-        <div ref={this.setFocusTrapWrapper}>
-          <EventListener event="focusout" handler={this.handleBlur} />
-          {children}
-        </div>
-      </Focus>
-    );
-  }
-
-  private get shouldDisable() {
-    const {trapping = true} = this.props;
-    const {shouldFocusSelf} = this.state;
-
+  const shouldDisable = () => {
     if (shouldFocusSelf === undefined) {
       return true;
     }
 
     return shouldFocusSelf ? !trapping : !shouldFocusSelf;
-  }
-
-  private setFocusTrapWrapper = (node: HTMLDivElement) => {
-    this.focusTrapWrapper = node;
   };
 
-  private handleBlur = (event: FocusEvent) => {
-    const {relatedTarget} = event;
-    const {focusTrapWrapper} = this;
-    const {trapping = true} = this.props;
+  const handleKeyDownLastElement = (event: any) => {
+    if (
+      event.keyCode === Key.Tab &&
+      !event.shiftKey &&
+      focusTrapWrapper.current != null
+    ) {
+      event.preventDefault();
+      focusFirstFocusableNode(focusTrapWrapper.current);
+    }
+    document.removeEventListener('keydown', handleKeyDownLastElement);
+  };
 
-    if (trapping === false) {
+  const handleKeyDownFirstElement = (event: any) => {
+    console.log(event.keyCode === Key.Tab);
+    console.log(event);
+    console.log(event.shiftKey);
+    console.log(focusTrapWrapper.current != null);
+    if (
+      event.keyCode === Key.Tab &&
+      event.shiftKey &&
+      focusTrapWrapper.current != null
+    ) {
+      event.preventDefault();
+      focusLastFocusableNode(focusTrapWrapper.current);
+    }
+    document.removeEventListener('keydown', handleKeyDownFirstElement);
+  };
+
+  const handleBlur = (event: FocusEvent) => {
+    if (trapping === false || !focusTrapWrapper.current) {
       return;
     }
 
-    if (
-      focusTrapWrapper &&
-      !focusTrapWrapper.contains(relatedTarget as HTMLElement) &&
-      (!relatedTarget ||
-        !closest(relatedTarget as HTMLElement, '[data-polaris-overlay]'))
-    ) {
-      event.preventDefault();
+    const {relatedTarget} = event;
 
-      if (event.srcElement === findFirstFocusableNode(focusTrapWrapper)) {
-        return write(() => focusLastFocusableNode(focusTrapWrapper));
-      }
-      const firstNode = findFirstFocusableNode(focusTrapWrapper) as HTMLElement;
-      write(() => focusFirstFocusableNode(firstNode));
+    if (
+      relatedTarget &&
+      !focusTrapWrapper.current.contains(event.target as Node)
+    ) {
+      focusFirstFocusableNode(focusTrapWrapper.current);
+    }
+
+    if (relatedTarget === findLastFocusableNode(focusTrapWrapper.current)) {
+      document.addEventListener('keydown', handleKeyDownLastElement);
+    }
+
+    if (relatedTarget === findFirstFocusableNode(focusTrapWrapper.current)) {
+      document.addEventListener('keydown', handleKeyDownFirstElement);
     }
   };
+
+  const handleFocusIn = (event: FocusEvent) => {
+    if (trapping === false || !focusTrapWrapper.current) {
+      return;
+    }
+
+    const {relatedTarget} = event;
+
+    if (relatedTarget == null) {
+      focusFirstFocusableNode(focusTrapWrapper.current);
+    }
+  };
+
+  return (
+    <Focus disabled={shouldDisable()} root={focusTrapWrapper.current}>
+      <div ref={focusTrapWrapper}>
+        <EventListener event="focusout" handler={handleBlur} />
+        <EventListener event="focusin" handler={handleFocusIn} />
+        {children}
+      </div>
+    </Focus>
+  );
 }
