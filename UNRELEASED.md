@@ -2,6 +2,8 @@
 
 ### Breaking changes
 
+- Remove unstable telemetry API for icons ([#]())
+
 ### Enhancements
 
 ### Bug fixes
