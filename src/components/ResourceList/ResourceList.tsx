@@ -51,6 +51,8 @@ export interface ResourceListProps {
   /** Item data; each item is passed to renderItem */
   items: Items;
   filterControl?: React.ReactNode;
+  /** Whether or not to display the empty state markup set on the emptyState prop. */
+  showEmptyState: boolean;
   /** The markup to render when no resources exist yet */
   emptyState?: React.ReactNode;
   /** Name of the resource, such as customers or products */
@@ -66,7 +68,7 @@ export interface ResourceListProps {
   selectedItems?: ResourceListSelectedItems;
   /** Renders a Select All button at the top of the list and checkboxes in front of each list item. For use when bulkActions aren't provided. **/
   selectable?: boolean;
-  /** If there are more items than currently in the list */
+  /** Whether or not there are more items than currently set on the items prop. Determines whether or not to set the paginatedSelectAllAction and paginatedSelectAllText props on the BulkActions component. */
   hasMoreItems?: boolean;
   /** Overlays item list with a spinner while a background action is being performed */
   loading?: boolean;
@@ -88,7 +90,7 @@ export interface ResourceListProps {
   renderItem(item: any, id: string, index: number): React.ReactNode;
   /** Function to customize the unique ID for each item */
   idForItem?(item: any, index: number): string;
-  /** Function to resolve an id from a item */
+  /** Function to resolve the ids of items */
   resolveItemId?(item: any): string;
 }
 
@@ -383,9 +385,9 @@ class ResourceList extends React.Component<CombinedProps, State> {
       promotedBulkActions,
       bulkActions,
       filterControl,
+      showEmptyState = false,
       emptyState,
       loading,
-      hasMoreItems,
       showHeader = false,
       sortOptions,
       sortValue,
@@ -478,14 +480,22 @@ class ResourceList extends React.Component<CombinedProps, State> {
       <div className={styles['HeaderWrapper-overlay']} />
     ) : null;
 
-    const showNoResults =
-      filterControl && !this.itemsExist() && hasMoreItems && !loading;
+    const showEmptyStateMarkup =
+      !loading && showEmptyState && emptyState && !this.itemsExist();
 
-    const showEmptyState =
-      emptyState !== undefined && !this.itemsExist() && !hasMoreItems;
+    const emptyStateMarkup = showEmptyStateMarkup ? emptyState : null;
+
+    const showNoResults =
+      !showEmptyStateMarkup && filterControl && !this.itemsExist() && !loading;
+
+    const noResultsMarkup = showNoResults ? (
+      <div className={styles.EmptySearchResultWrapper}>
+        <EmptySearchResult {...this.emptySearchResultText()} withIllustration />
+      </div>
+    ) : null;
 
     const headerMarkup = !showNoResults &&
-      !showEmptyState &&
+      !showEmptyStateMarkup &&
       (showHeader || needsHeader) &&
       this.listRef.current && (
         <div className={styles.HeaderOuterWrapper}>
@@ -523,14 +533,6 @@ class ResourceList extends React.Component<CombinedProps, State> {
           </Sticky>
         </div>
       );
-
-    const noResultsMarkup = showNoResults ? (
-      <div className={styles.EmptySearchResultWrapper}>
-        <EmptySearchResult {...this.emptySearchResultText()} withIllustration />
-      </div>
-    ) : null;
-
-    const emptyStateMarkup = showEmptyState ? emptyState : null;
 
     const defaultTopPadding = 8;
     const topPadding =

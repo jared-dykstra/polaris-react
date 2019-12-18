@@ -90,17 +90,32 @@ Use to explain the purpose of a list of resources when no resources exist yet. T
 
 ```jsx
 function ResourceListWithEmptyStateExample() {
+  const items = [];
+  const appliedFilters = [];
+
   const filters = [
     {
       key: 'fileType',
       label: 'File type',
-      filter: <TextField label="File type" value="" labelHidden />,
+      filter: (
+        <Select
+          labelHidden
+          label="File type"
+          value=""
+          options={[
+            {label: 'JPEG', value: 'jpeg'},
+            {label: 'PNG', value: 'png'},
+            {label: 'MP4', value: 'mp4'},
+          ]}
+          onChange={() =>{}}
+        />
+      ),
       shortcut: true,
     },
   ];
 
   const filterControl = (
-    <Filters disabled queryValue="" filters={filters} appliedFilters={[]} />
+    <Filters disabled={!items.length} queryValue="" filters={filters} appliedFilters={appliedFilters} />
   );
 
   const emptyState = (
@@ -119,8 +134,9 @@ function ResourceListWithEmptyStateExample() {
   return (
     <Card>
       <ResourceList
+        showEmptyState={!appliedFilters.length && !items.length}
         emptyState={emptyState}
-        items={[]}
+        items={items}
         renderItem={() => {}}
         filterControl={filterControl}
         resourceName={{singular: 'file', plural: 'files'}}
