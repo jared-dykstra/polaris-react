@@ -65,13 +65,13 @@ export function Dialog({
         data-polaris-overlay
         ref={containerNode}
       >
-        <div
-          role="dialog"
-          aria-labelledby={labelledBy}
-          tabIndex={-1}
-          className={styles.Dialog}
-        >
-          <TrapFocus>
+        <TrapFocus>
+          <div
+            role="dialog"
+            aria-labelledby={labelledBy}
+            tabIndex={-1}
+            className={styles.Dialog}
+          >
             <div className={classes}>
               <KeypressListener
                 keyCode={Key.Escape}
@@ -80,8 +80,8 @@ export function Dialog({
               />
               {children}
             </div>
-          </TrapFocus>
-        </div>
+          </div>
+        </TrapFocus>
       </div>
     </TransitionChild>
   );
