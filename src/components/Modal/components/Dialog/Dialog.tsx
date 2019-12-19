@@ -1,6 +1,7 @@
 import React, {useRef, useCallback} from 'react';
 import {durationBase} from '@shopify/polaris-tokens';
 import {Transition, CSSTransition} from '@material-ui/react-transition-group';
+import {focusFirstFocusableNode} from '@shopify/javascript-utilities/focus';
 import {classNames} from '../../../../utilities/css';
 
 import {AnimationProps, Key} from '../../../../types';
@@ -8,6 +9,7 @@ import {AnimationProps, Key} from '../../../../types';
 import {KeypressListener} from '../../../KeypressListener';
 import {TrapFocus} from '../../../TrapFocus';
 
+import {useComponentDidMount} from '../../../../utilities/use-component-did-mount';
 import styles from './Dialog.scss';
 
 export interface BaseDialogProps {
@@ -42,6 +44,10 @@ export function Dialog({
     limitHeight && styles.limitHeight,
   );
   const TransitionChild = instant ? Transition : FadeUp;
+
+  useComponentDidMount(() => {
+    containerNode.current && focusFirstFocusableNode(containerNode.current)
+  });
 
   return (
     <TransitionChild
