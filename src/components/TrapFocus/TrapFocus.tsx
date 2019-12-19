@@ -1,11 +1,7 @@
 import React, {useState, useRef} from 'react';
-import {
-  focusFirstFocusableNode,
-  focusLastFocusableNode,
-  findLastFocusableNode,
-} from '@shopify/javascript-utilities/focus';
-
 import {Key} from '../../types';
+
+import {focusFirstFocusableNode} from '@shopify/javascript-utilities/focus';
 import {useComponentDidMount} from '../../utilities/use-component-did-mount';
 import {EventListener} from '../EventListener';
 import {KeypressListener, KeyEvent} from '../KeypressListener';
@@ -14,6 +10,8 @@ import {Focus} from '../Focus';
 import {
   findFirstKeyboardFocusableNode,
   focusFirstKeyboardFocusableNode,
+  findLastKeyboardFocusableNode,
+  focusLastKeyboardFocusableNode,
 } from '../../utilities/focus';
 
 export interface TrapFocusProps {
@@ -49,11 +47,14 @@ export function TrapFocus({trapping = true, children}: TrapFocusProps) {
   };
 
   const handleFocusIn = (event: FocusEvent) => {
+    const containerContentsHaveFocus =
+      focusTrapWrapper.current &&
+      focusTrapWrapper.current.contains(document.activeElement);
+
     if (
       trapping === false ||
       !focusTrapWrapper.current ||
-      (focusTrapWrapper.current &&
-        focusTrapWrapper.current.contains(document.activeElement))
+      containerContentsHaveFocus
     ) {
       return;
     }
@@ -74,7 +75,9 @@ export function TrapFocus({trapping = true, children}: TrapFocusProps) {
     const firstFocusableNode = findFirstKeyboardFocusableNode(
       focusTrapWrapper.current,
     );
-    const lastFocusableNode = findLastFocusableNode(focusTrapWrapper.current);
+    const lastFocusableNode = findLastKeyboardFocusableNode(
+      focusTrapWrapper.current,
+    );
 
     if (event.target === lastFocusableNode && !event.shiftKey) {
       event.preventDefault();
@@ -83,7 +86,7 @@ export function TrapFocus({trapping = true, children}: TrapFocusProps) {
 
     if (event.target === firstFocusableNode && event.shiftKey) {
       event.preventDefault();
-      focusLastFocusableNode(focusTrapWrapper.current);
+      focusLastKeyboardFocusableNode(focusTrapWrapper.current);
     }
   };
 

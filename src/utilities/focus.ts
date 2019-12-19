@@ -68,6 +68,27 @@ export function focusFirstKeyboardFocusableNode(
   }
 }
 
+export function findLastKeyboardFocusableNode(
+  element: HTMLElement,
+  onlyDescendants = true,
+) {
+  if (!onlyDescendants && matches(element, KEYBOARD_FOCUSABLE_SELECTORS)) {
+    return element;
+  }
+  const allFocusable = element.querySelectorAll(KEYBOARD_FOCUSABLE_SELECTORS);
+  return allFocusable[allFocusable.length - 1] as HTMLElement | null;
+}
+
+export function focusLastKeyboardFocusableNode(
+  element: HTMLElement,
+  onlyDescendants = true,
+) {
+  const lastFocusable = findLastKeyboardFocusableNode(element, onlyDescendants);
+  if (lastFocusable) {
+    lastFocusable.focus();
+  }
+}
+
 function matches(node: HTMLElement, selector: string) {
   if (node.matches) {
     return node.matches(selector);
@@ -75,6 +96,5 @@ function matches(node: HTMLElement, selector: string) {
 
   const matches = (node.ownerDocument || document).querySelectorAll(selector);
   let i = matches.length;
-  while (--i >= 0 && matches.item(i) !== node) {}
-  return i > -1;
+  while (--i >= 0 && matches.item(i) !== node) return i > -1;
 }
