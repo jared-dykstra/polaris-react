@@ -1,7 +1,7 @@
 import React, {useState, useRef} from 'react';
+import {focusFirstFocusableNode} from '@shopify/javascript-utilities/focus';
 import {Key} from '../../types';
 
-import {focusFirstFocusableNode} from '@shopify/javascript-utilities/focus';
 import {useComponentDidMount} from '../../utilities/use-component-did-mount';
 import {EventListener} from '../EventListener';
 import {KeypressListener, KeyEvent} from '../KeypressListener';
