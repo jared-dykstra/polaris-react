@@ -45,9 +45,15 @@ export function TrapFocus({trapping = true, children}: TrapFocusProps) {
   };
 
   const handleFocusIn = (event: FocusEvent) => {
-    if (trapping === false || !focusTrapWrapper.current) {
+    if (
+      trapping === false ||
+      !focusTrapWrapper.current ||
+      (focusTrapWrapper.current &&
+        focusTrapWrapper.current.contains(document.activeElement))
+    ) {
       return;
     }
+
     if (
       focusTrapWrapper.current !== event.target &&
       !focusTrapWrapper.current.contains(event.target as Node)
