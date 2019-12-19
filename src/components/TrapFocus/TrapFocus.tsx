@@ -1,7 +1,6 @@
 import React, {useState, useRef} from 'react';
 import {
   focusFirstFocusableNode,
-  findFirstFocusableNode,
   focusLastFocusableNode,
   findLastFocusableNode,
 } from '@shopify/javascript-utilities/focus';
@@ -11,6 +10,11 @@ import {useComponentDidMount} from '../../utilities/use-component-did-mount';
 import {EventListener} from '../EventListener';
 import {KeypressListener, KeyEvent} from '../KeypressListener';
 import {Focus} from '../Focus';
+
+import {
+  findFirstKeyboardFocusableNode,
+  focusFirstKeyboardFocusableNode,
+} from '../../utilities/focus';
 
 export interface TrapFocusProps {
   trapping?: boolean;
@@ -66,12 +70,15 @@ export function TrapFocus({trapping = true, children}: TrapFocusProps) {
     if (trapping === false || !focusTrapWrapper.current) {
       return;
     }
-    const firstFocusableNode = findFirstFocusableNode(focusTrapWrapper.current);
+
+    const firstFocusableNode = findFirstKeyboardFocusableNode(
+      focusTrapWrapper.current,
+    );
     const lastFocusableNode = findLastFocusableNode(focusTrapWrapper.current);
 
     if (event.target === lastFocusableNode && !event.shiftKey) {
       event.preventDefault();
-      focusFirstFocusableNode(focusTrapWrapper.current);
+      focusFirstKeyboardFocusableNode(focusTrapWrapper.current);
     }
 
     if (event.target === firstFocusableNode && event.shiftKey) {
