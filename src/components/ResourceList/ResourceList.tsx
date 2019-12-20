@@ -52,7 +52,7 @@ export interface ResourceListProps {
   items: Items;
   filterControl?: React.ReactNode;
   /** Whether or not to display the empty state markup set on the emptyState prop. */
-  showEmptyState: boolean;
+  showEmptyState?: boolean;
   /** The markup to render when no resources exist yet */
   emptyState?: React.ReactNode;
   /** Name of the resource, such as customers or products */

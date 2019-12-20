@@ -505,7 +505,33 @@ describe('<ResourceList />', () => {
   });
 
   describe('emptyState', () => {
-    it('renders when no items are provided and hasMoreItems is unset', () => {
+    it('renders when exists and showEmptyState is true', () => {
+      const emptyState = (
+        <EmptyState
+          heading="Upload a file to get started"
+          action={{content: 'Upload files'}}
+          image="https://cdn.shopify.com/s/files/1/2376/3301/products/file-upload-empty-state.png"
+        >
+          <p>
+            You can use the Files section to upload images, videos, and other
+            documents
+          </p>
+        </EmptyState>
+      );
+
+      const resourceList = mountWithAppProvider(
+        <ResourceList
+          showEmptyState
+          items={[]}
+          renderItem={renderItem}
+          emptyState={emptyState}
+        />,
+      );
+
+      expect(resourceList.find(EmptyState)).toHaveLength(1);
+    });
+
+    it('does not render when exists but showEmptyState is unset', () => {
       const emptyState = (
         <EmptyState
           heading="Upload a file to get started"
@@ -527,7 +553,33 @@ describe('<ResourceList />', () => {
         />,
       );
 
-      expect(resourceList.find(EmptyState)).toHaveLength(1);
+      expect(resourceList.find(EmptyState)).toHaveLength(0);
+    });
+
+    it('does not render when exists but showEmptyState is false', () => {
+      const emptyState = (
+        <EmptyState
+          heading="Upload a file to get started"
+          action={{content: 'Upload files'}}
+          image="https://cdn.shopify.com/s/files/1/2376/3301/products/file-upload-empty-state.png"
+        >
+          <p>
+            You can use the Files section to upload images, videos, and other
+            documents
+          </p>
+        </EmptyState>
+      );
+
+      const resourceList = mountWithAppProvider(
+        <ResourceList
+          showEmptyState={false}
+          items={[]}
+          renderItem={renderItem}
+          emptyState={emptyState}
+        />,
+      );
+
+      expect(resourceList.find(EmptyState)).toHaveLength(0);
     });
 
     it('does not render when exists but items are provided', () => {
@@ -546,6 +598,7 @@ describe('<ResourceList />', () => {
 
       const resourceList = mountWithAppProvider(
         <ResourceList
+          showEmptyState
           items={itemsNoID}
           renderItem={renderItem}
           emptyState={emptyState}
@@ -555,7 +608,7 @@ describe('<ResourceList />', () => {
       expect(resourceList.find(EmptyState)).toHaveLength(0);
     });
 
-    it('does not render when exists but hasMoreItems is true', () => {
+    it('does not render when exists, items is empty, but loading is true', () => {
       const emptyState = (
         <EmptyState
           heading="Upload a file to get started"
@@ -571,7 +624,8 @@ describe('<ResourceList />', () => {
 
       const resourceList = mountWithAppProvider(
         <ResourceList
-          hasMoreItems
+          loading
+          showEmptyState
           items={[]}
           renderItem={renderItem}
           emptyState={emptyState}
@@ -582,7 +636,61 @@ describe('<ResourceList />', () => {
     });
   });
 
-  describe('emptySearchResult', () => {
+  describe('showEmptyState', () => {
+    it('renders emptyState when true', () => {
+      const emptyState = (
+        <EmptyState
+          heading="Upload a file to get started"
+          action={{content: 'Upload files'}}
+          image="https://cdn.shopify.com/s/files/1/2376/3301/products/file-upload-empty-state.png"
+        >
+          <p>
+            You can use the Files section to upload images, videos, and other
+            documents
+          </p>
+        </EmptyState>
+      );
+
+      const resourceList = mountWithAppProvider(
+        <ResourceList
+          showEmptyState
+          items={[]}
+          renderItem={renderItem}
+          emptyState={emptyState}
+        />,
+      );
+
+      expect(resourceList.find(EmptyState)).toHaveLength(1);
+    });
+
+    it('does not render emptyState when false', () => {
+      const emptyState = (
+        <EmptyState
+          heading="Upload a file to get started"
+          action={{content: 'Upload files'}}
+          image="https://cdn.shopify.com/s/files/1/2376/3301/products/file-upload-empty-state.png"
+        >
+          <p>
+            You can use the Files section to upload images, videos, and other
+            documents
+          </p>
+        </EmptyState>
+      );
+
+      const resourceList = mountWithAppProvider(
+        <ResourceList
+          showEmptyState={false}
+          items={[]}
+          renderItem={renderItem}
+          emptyState={emptyState}
+        />,
+      );
+
+      expect(resourceList.find(EmptyState)).toHaveLength(0);
+    });
+  });
+
+  describe('<EmptySearchResult />', () => {
     it('renders when filterControl exists and items is empty', () => {
       const resourceList = mountWithAppProvider(
         <ResourceList
