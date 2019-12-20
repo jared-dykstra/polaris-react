@@ -49,7 +49,7 @@ describe('<TrapFocus />', () => {
 
     // Renders an event listener
     expect(trapFocus.find(EventListener)).toHaveLength(1);
-    expect(trapFocus.find(EventListener).prop('event')).toBe('focusout');
+    expect(trapFocus.find(EventListener).prop('event')).toBe('focusin');
   });
 
   it('renders a Focus component with a `disabled` prop set to false by default', () => {
