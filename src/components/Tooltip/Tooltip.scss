@@ -7,7 +7,7 @@ $content-max-width: rem(200px);
 .Tooltip {
   margin: $offset-from-activator spacing() spacing();
   opacity: 1;
-  box-shadow: var(--p-override-none, shadow(deep));
+  box-shadow: var(--p-tooltip-shadow, shadow(deep));
   border-radius: var(--p-border-radius-base, border-radius());
   pointer-events: none;
   will-change: opacity, left, top;
@@ -36,9 +36,9 @@ $content-max-width: rem(200px);
 .Wrapper {
   position: relative;
   display: flex;
-  background-color: var(--p-surface-inverse-foreground, color('ink'));
+  background-color: var(--p-surface, color('ink'));
   border-radius: var(--p-border-radius-base, border-radius());
-  color: var(--p-text-on-inverse, color('white'));
+  color: var(--p-text, color('white'));
   max-height: $content-max-height;
 }
 
